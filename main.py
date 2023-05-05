@@ -18,13 +18,15 @@ TRANSITION_SPEED = 3
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 
-background = pygame.image.load("higher_quality/bg-removebg.png")
-big_needle_image = pygame.image.load("higher_quality/big_needle.png")
-big_needle_pivot_point = (62-big_needle_image.get_width()/2, 839-big_needle_image.get_height()/2)
-small_needle_image = pygame.image.load("higher_quality/small_needle.png")
-small_needle_pivot_point = (72-small_needle_image.get_width()/2, 646-small_needle_image.get_height()/2)
-tens_needle_image = pygame.image.load("higher_quality/tens_needle.png")
-tens_needle_pivot_point = (31-tens_needle_image.get_width()/2, 242-tens_needle_image.get_height()/2)
+background = pygame.image.load("higher_quality_smaller_res/bg-removebg.png")
+big_needle_image = pygame.image.load("higher_quality_smaller_res/big_needle.png")
+big_needle_pivot_point = (21-big_needle_image.get_width()/2, 285-big_needle_image.get_height()/2)
+small_needle_image = pygame.image.load("higher_quality_smaller_res/small_needle.png")
+small_needle_pivot_point = (24-small_needle_image.get_width()/2, 220-small_needle_image.get_height()/2)
+tens_needle_image = pygame.image.load("higher_quality_smaller_res/tens_needle.png")
+tens_needle_pivot_point = (11-tens_needle_image.get_width()/2, 82-tens_needle_image.get_height()/2)
+
+#rotations =
 
 #new_big_needle_image = pygame.Surface((big_needle_image.get_width() * 1.6167664670658684, big_needle_image.get_height() * 1.6167664670658684)).convert_alpha()
 #new_big_needle_image.fill((0, 0, 0, 0))
@@ -53,11 +55,11 @@ def rotate(image, angle, pivot):
 def display_clock(small_needle_rotation, big_needle_rotation, tens_needle_rotation):
     surface.blit(background, (0, 0))
     small_needle_transformed, rect = rotate(small_needle_image, -small_needle_rotation, small_needle_pivot_point)
-    surface.blit(small_needle_transformed, rect.move(1085, 2000))
+    surface.blit(small_needle_transformed, rect.move(369, 680))
     big_needle_transformed, rect = rotate(big_needle_image, -big_needle_rotation, big_needle_pivot_point)
-    surface.blit(big_needle_transformed, rect.move(1085, 2000))
+    surface.blit(big_needle_transformed, rect.move(369, 680))
     tens_needle_transformed, rect = rotate(tens_needle_image, -tens_needle_rotation, tens_needle_pivot_point)
-    surface.blit(tens_needle_transformed, rect.move(1082, 2494))
+    surface.blit(tens_needle_transformed, rect.move(368, 848))
 
 
 def display_current_time():
@@ -131,6 +133,7 @@ while True:
     #print(1920/2 - background.get_width()/2)
     #print(pygame.mouse.get_pos())
     pygame.transform.smoothscale(surface, (int(background.get_width()*scale_factor), HEIGHT), screen.subsurface((WIDTH/2 - background.get_width()*scale_factor/2, 0, background.get_width()*scale_factor, HEIGHT)))
+    #print(scale_factor)
     pygame.display.flip()
 
 
