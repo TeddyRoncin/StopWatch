@@ -1,8 +1,12 @@
+#!/usr/bin/python3
 import time
 from datetime import datetime
 from math import cos, sin, radians
 
 import pygame
+
+WIDTH = 1824
+HEIGHT = 984
 
 
 DISPLAY_TIME = 0
@@ -12,7 +16,7 @@ WAITING_FOR_TIMER = 3
 
 TRANSITION_SPEED = 3
 
-screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 
 background = pygame.image.load("higher_quality/bg-removebg.png")
 big_needle_image = pygame.image.load("higher_quality/big_needle.png")
@@ -70,7 +74,7 @@ def display_timer():
     time = datetime.now() - timer_started_at
     seconds = time.seconds % 60
     minutes = (time.seconds - seconds) / 60
-    tens_angle = time.microseconds / 1_000_000 * 360
+    tens_angle = time.microseconds / 1000000 * 360
     seconds_angle = seconds / 60 * 360
     minutes_angle = minutes / 60 * 360
     display_clock(minutes_angle, seconds_angle, tens_angle)
@@ -120,13 +124,13 @@ while True:
         display_timer()
     elif mode == TRANSITION or WAITING_FOR_TIMER:
         display_transition()
-    scale_factor = 1080 / background.get_height()
+    scale_factor = HEIGHT / background.get_height()
     print(clock.get_fps())
     #print("-----")
     #print(background.get_width())
     #print(1920/2 - background.get_width()/2)
     #print(pygame.mouse.get_pos())
-    pygame.transform.smoothscale(surface, (background.get_width()*scale_factor, 1080), screen.subsurface((1920/2 - background.get_width()*scale_factor/2, 0, background.get_width()*scale_factor, 1080)))
+    pygame.transform.smoothscale(surface, (int(background.get_width()*scale_factor), HEIGHT), screen.subsurface((WIDTH/2 - background.get_width()*scale_factor/2, 0, background.get_width()*scale_factor, HEIGHT)))
     pygame.display.flip()
 
 
