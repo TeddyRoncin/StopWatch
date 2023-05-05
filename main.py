@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import cProfile
+import pstats
 import time
 from datetime import datetime
 from math import cos, sin, radians
@@ -18,13 +20,39 @@ TRANSITION_SPEED = 3
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 
-background = pygame.image.load("higher_quality_smaller_res/bg-removebg.png")
-big_needle_image = pygame.image.load("higher_quality_smaller_res/big_needle.png")
-big_needle_pivot_point = (21-big_needle_image.get_width()/2, 285-big_needle_image.get_height()/2)
-small_needle_image = pygame.image.load("higher_quality_smaller_res/small_needle.png")
-small_needle_pivot_point = (24-small_needle_image.get_width()/2, 220-small_needle_image.get_height()/2)
-tens_needle_image = pygame.image.load("higher_quality_smaller_res/tens_needle.png")
-tens_needle_pivot_point = (11-tens_needle_image.get_width()/2, 82-tens_needle_image.get_height()/2)
+background = pygame.image.load("higher_quality/bg-removebg.png").convert_alpha()
+big_needle_image = pygame.image.load("higher_quality/big_needle.png").convert_alpha()
+small_needle_image = pygame.image.load("higher_quality/small_needle.png").convert_alpha()
+tens_needle_image = pygame.image.load("higher_quality/tens_needle.png").convert_alpha()
+
+#background = pygame.image.load("higher_quality_smaller_res/bg-removebg.png").convert_alpha()
+#big_needle_image = pygame.image.load("higher_quality_smaller_res/big_needle.png").convert_alpha()
+#small_needle_image = pygame.image.load("higher_quality_smaller_res/small_needle.png").convert_alpha()
+#tens_needle_image = pygame.image.load("higher_quality_smaller_res/tens_needle.png").convert_alpha()
+
+scale_factor = HEIGHT / background.get_height()
+
+
+def resize_image(image):
+    new_image = pygame.Surface((int(image.get_width() * scale_factor), int(image.get_height() * scale_factor))).convert_alpha()
+    new_image.fill((0, 0, 0, 0))
+    pygame.transform.smoothscale_by(image, scale_factor, new_image)
+    return new_image
+
+
+background = resize_image(background)
+big_needle_image = resize_image(big_needle_image)
+small_needle_image = resize_image(small_needle_image)
+tens_needle_image = resize_image(tens_needle_image)
+
+big_needle_pivot_point = (62*scale_factor-big_needle_image.get_width()/2, 836*scale_factor-big_needle_image.get_height()/2)
+small_needle_pivot_point = (72*scale_factor-small_needle_image.get_width()/2, 646*scale_factor-small_needle_image.get_height()/2)
+tens_needle_pivot_point = (31*scale_factor-tens_needle_image.get_width()/2, 242*scale_factor-tens_needle_image.get_height()/2)
+
+print("big needle pivot point : ", big_needle_pivot_point)
+
+print(background.get_size())
+
 
 #rotations =
 
@@ -41,6 +69,8 @@ needles_pos = (0, 0, 0)
 
 mode = DISPLAY_TIME
 
+stop = False
+
 
 def rotate(image, angle, pivot):
     rotated = pygame.transform.rotate(image, angle)
@@ -55,11 +85,11 @@ def rotate(image, angle, pivot):
 def display_clock(small_needle_rotation, big_needle_rotation, tens_needle_rotation):
     surface.blit(background, (0, 0))
     small_needle_transformed, rect = rotate(small_needle_image, -small_needle_rotation, small_needle_pivot_point)
-    surface.blit(small_needle_transformed, rect.move(369, 680))
+    surface.blit(small_needle_transformed, rect.move(1085*scale_factor, 2000*scale_factor))
     big_needle_transformed, rect = rotate(big_needle_image, -big_needle_rotation, big_needle_pivot_point)
-    surface.blit(big_needle_transformed, rect.move(369, 680))
+    surface.blit(big_needle_transformed, rect.move(1085*scale_factor, 2000*scale_factor))
     tens_needle_transformed, rect = rotate(tens_needle_image, -tens_needle_rotation, tens_needle_pivot_point)
-    surface.blit(tens_needle_transformed, rect.move(368, 848))
+    surface.blit(tens_needle_transformed, rect.move(1082*scale_factor, 2494*scale_factor))
 
 
 def display_current_time():
@@ -107,33 +137,39 @@ def display_transition():
         timer_started_at = datetime.now()
     display_clock(*needles_pos)
 
+def main():
+    global mode, stop
+    clock = pygame.time.Clock()
+    while not stop:
+        clock.tick(60)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    stop = True
+                elif event.key == pygame.K_SPACE and mode == DISPLAY_TIME:
+                    mode = TRANSITION
+        screen.fill((0, 0, 0))
+        surface.fill((0, 0, 0))
+        if mode == DISPLAY_TIME:
+            display_current_time()
+        elif mode == DISPLAY_TIMER:
+            display_timer()
+        elif mode == TRANSITION or WAITING_FOR_TIMER:
+            display_transition()
+        scale_factor = HEIGHT / background.get_height()
+        print(clock.get_fps())
+        #print("-----")
+        #print(background.get_width())
+        #print(1920/2 - background.get_width()/2)
+        #print(pygame.mouse.get_pos())
+        pygame.transform.smoothscale(surface, (int(background.get_width()*scale_factor), HEIGHT), screen.subsurface((WIDTH/2 - background.get_width()*scale_factor/2, 0, background.get_width()*scale_factor, HEIGHT)))
+        #print(scale_factor)
+        pygame.display.flip()
+    pygame.quit()
 
-clock = pygame.time.Clock()
-while True:
-    clock.tick(60)
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_q:
-                pygame.quit()
-                exit()
-            elif event.key == pygame.K_SPACE and mode == DISPLAY_TIME:
-                mode = TRANSITION
-    screen.fill((0, 0, 0))
-    surface.fill((0, 0, 0))
-    if mode == DISPLAY_TIME:
-        display_current_time()
-    elif mode == DISPLAY_TIMER:
-        display_timer()
-    elif mode == TRANSITION or WAITING_FOR_TIMER:
-        display_transition()
-    scale_factor = HEIGHT / background.get_height()
-    print(clock.get_fps())
-    #print("-----")
-    #print(background.get_width())
-    #print(1920/2 - background.get_width()/2)
-    #print(pygame.mouse.get_pos())
-    pygame.transform.smoothscale(surface, (int(background.get_width()*scale_factor), HEIGHT), screen.subsurface((WIDTH/2 - background.get_width()*scale_factor/2, 0, background.get_width()*scale_factor, HEIGHT)))
-    #print(scale_factor)
-    pygame.display.flip()
 
-
+with cProfile.Profile() as pr:
+    main()
+stats = pstats.Stats(pr)
+stats.sort_stats(pstats.SortKey.TIME)
+stats.print_stats()
